@@ -1,5 +1,8 @@
 # Retail Pulse - Sales Analytics Dashboard
 
+**GitHub User ID**: sachinLabs14  
+**Repository URL**: [https://github.com/sachinLabs14/Retail_Pluse](https://github.com/sachinLabs14/Retail_Pluse)
+
 **Retail Pulse** is a comprehensive sales analytics platform designed to provide actionable insights into retail data. It leverages Big Data technologies to process large datasets and presents them through an intuitive web dashboard.
 
 ## 🚀 Features
@@ -36,7 +39,7 @@ Before running the project, ensure you have the following installed:
 
 1. **Clone the repository**:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/sachinLabs14/Retail_Pluse.git
    cd Retail_Pluse
    ```
 
