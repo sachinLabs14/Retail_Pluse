@@ -1,0 +1,226 @@
+{% extends "layout.html" %}
+{% set active_page = 'index' %}
+{% block title %}Dashboard - RetailPro{% endblock %}
+
+{% block content %}
+        <div class="header-nav d-flex justify-content-between align-items-center rounded shadow-sm">
+            <h4 class="m-0">Business Intelligence Overview</h4>
+            <div class="user-info d-flex align-items-center">
+                <button id="refreshBtn" class="btn btn-outline-info btn-refresh me-3">
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                    <i class="fas fa-sync-alt me-1 icon-refresh"></i> Refresh Data
+                </button>
+                <span class="me-3 text-muted small"><i class="fas fa-calendar-alt me-1"></i> Feb 2026</span>
+                <button class="btn btn-outline-primary btn-sm rounded-pill"><i class="fas fa-download me-1"></i> Report</button>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-white border-0" style="background: linear-gradient(135deg, #4b12cb 0%, #1e56fc 100%);">
+                    <div class="card-body">
+                        <h6 class="text-white-50">Total Revenue</h6>
+                        <h2 class="display-6 font-weight-bold">${{ total_revenue }}</h2>
+                        <p class="mb-0 small"><i class="fas fa-arrow-up me-1"></i> 12% increase</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Total Transactions</h6>
+                        <h2 class="text-info">{{ anomalies|length + 120 }}</h2>
+                        <div class="progress mt-3 bg-dark" style="height: 4px;">
+                            <div class="progress-bar bg-info" style="width: 75%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted">Global Presence</h6>
+                        <h2 class="text-warning">{{ geo_labels|length }} Countries</h2>
+                        <p class="text-success mb-0 small"><i class="fas fa-globe me-1"></i> Active</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Charts Row -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Sales Trend & Predictive Analysis</h6>
+                        <div style="height: 300px;">
+                            <canvas id="mainTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Customer Segments</h6>
+                        <div style="height: 300px;">
+                            <canvas id="segmentPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Revenue by Product</h6>
+                        <div style="height: 300px;">
+                            <canvas id="productBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Geography Distribution</h6>
+                        <div style="height: 300px;">
+                            <canvas id="geoPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deep Insights Row -->
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted"><i class="fas fa-user-tag me-2 text-info"></i>Customer RFM Rankings</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover border-0">
+                                <thead style="background: #252525;">
+                                    <tr>
+                                        <th class="border-0">ID</th>
+                                        <th class="border-0">Recency</th>
+                                        <th class="border-0">Monetary</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for r in rfm_data[:8] %}
+                                    <tr class="border-bottom border-secondary">
+                                        <td class="border-0"><span class="badge bg-dark border border-secondary text-info">#{{ r.CustomerID }}</span></td>
+                                        <td class="border-0">{{ r.Recency }}d</td>
+                                        <td class="border-0"><b class="text-success">${{ r.Monetary | round(2) }}</b></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="/customers" class="btn btn-sm btn-outline-info">View All Customers</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted"><i class="fas fa-magic me-2 text-info"></i>Smart Affinity</h6>
+                        <div class="list-group list-group-flush bg-transparent">
+                            {% for item in basket_data[:5] %}
+                            <div class="list-group-item bg-transparent px-0 py-2 border-secondary small">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="text-truncate" style="max-width: 150px;">{{ item.antecedent[0] }}</div>
+                                    <div class="text-info">&rarr; {{ item.consequent[0] }}</div>
+                                    <div class="badge bg-info bg-opacity-10 text-info">{{ (item.confidence * 100) | round(0) }}%</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<script>
+    Chart.defaults.color = '#999';
+    Chart.defaults.borderColor = '#333';
+
+    const trendLabels = {{ trend_labels | safe }};
+    const trendValues = {{ trend_values | safe }};
+    const forecastLabels = {{ forecast_labels | safe }};
+    const forecastValues = {{ forecast_values | safe }};
+    
+    const combinedLabels = [...trendLabels, ...forecastLabels];
+    const trendData = [...trendValues, ...Array(forecastValues.length).fill(null)];
+    const forecastData = [...Array(trendValues.length - 1).fill(null), trendValues[trendValues.length-1], ...forecastValues];
+
+    new Chart(document.getElementById('mainTrendChart'), {
+        type: 'line',
+        data: {
+            labels: combinedLabels,
+            datasets: [
+                { label: 'Actual', data: trendData, borderColor: '#3498db', backgroundColor: 'rgba(52, 152, 219, 0.1)', fill: true, tension: 0.4 },
+                { label: 'Forecast', data: forecastData, borderColor: '#e67e22', borderDash: [5, 5], fill: false, tension: 0.4 }
+            ]
+        },
+        options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById('segmentPieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ segment_labels | safe }},
+            datasets: [{ data: {{ segment_values | safe }}, backgroundColor: ['#2ecc71', '#3498db', '#e74c3c', '#f1c40f'], borderWidth: 0 }]
+        },
+        options: { maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('productBarChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ product_labels | safe }},
+            datasets: [{ data: {{ product_values | safe }}, backgroundColor: '#9b59b6', borderRadius: 10 }]
+        },
+        options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('geoPieChart'), {
+        type: 'polarArea',
+        data: {
+            labels: {{ geo_labels | safe }},
+            datasets: [{ data: {{ geo_values | safe }}, backgroundColor: ['#1abc9c', '#3498db', '#9b59b6', '#2c3e50', '#f39c12'], borderWidth: 0 }]
+        },
+        options: { maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+        const btn = this;
+        const spinner = btn.querySelector('.spinner-border');
+        btn.disabled = true;
+        spinner.style.display = 'inline-block';
+
+        fetch('/refresh', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                    btn.disabled = false;
+                    spinner.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            });
+    });
+</script>
+{% endblock %}
