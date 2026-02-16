@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% set active_page = 'products' %}
+{% block title %}Products - RetailPro{% endblock %}
+
+{% block content %}
+<div class="header-nav d-flex justify-content-between align-items-center rounded shadow-sm">
+    <h4 class="m-0">Product Catalog & Sales</h4>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Performance by Product</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Description</th>
+                                <th>Total Quantity Sold</th>
+                                <th>Total Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in products %}
+                            <tr>
+                                <td>{{ p.Description }}</td>
+                                <td>{{ p.TotalQuantity }}</td>
+                                <td class="text-success fw-bold">${{ p.TotalRevenue | round(2) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
