@@ -9,6 +9,10 @@ java_path = r"C:\Program Files\Eclipse Adoptium\jdk-11.0.30.7-hotspot"
 os.environ["JAVA_HOME"] = java_path
 os.environ["PATH"] = os.path.join(java_path, "bin") + os.pathsep + os.environ["PATH"]
 
+# Set HADOOP_HOME for Windows winutils
+os.environ["HADOOP_HOME"] = r"C:\hadoop"
+os.environ["PATH"] = os.path.join(os.environ["HADOOP_HOME"], "bin") + os.pathsep + os.environ["PATH"]
+
 # Set Python path for Spark
 python_path = r"C:\Users\k m manthesh\AppData\Local\Programs\Python\Python310\python.exe"
 os.environ["PYSPARK_PYTHON"] = python_path
@@ -125,7 +129,8 @@ def process_retail_data():
     # We need a sequential index for time
     from pyspark.sql.window import Window
     from pyspark.sql.functions import row_number
-    w = Window.orderBy("Year", "Month")
+    # Add a dummy column for partitioning to avoid "No Partition Defined" warning
+    w = Window.partitionBy(lit(1)).orderBy("Year", "Month")
     monthly_data = monthly_sales.withColumn("TimeIndex", row_number().over(w).cast("double"))
     
     assembler = VectorAssembler(inputCols=["TimeIndex"], outputCol="features")
