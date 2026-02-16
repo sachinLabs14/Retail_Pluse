@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.zencoder/
+.zenflow/
+inspect_data.py
+test_spark.py
+test_spark_no_home.py
+.venv/
+env/
+venv/
+.env
+*.log
