@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% set active_page = 'customers' %}
+{% block title %}Customers - RetailPro{% endblock %}
+
+{% block content %}
+<div class="header-nav d-flex justify-content-between align-items-center rounded shadow-sm">
+    <h4 class="m-0">Customer Intelligence</h4>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">All Customer RFM Metrics</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Customer ID</th>
+                                <th>Recency (Days)</th>
+                                <th>Frequency (Purchases)</th>
+                                <th>Monetary (Total Spend)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rfm_data %}
+                            <tr>
+                                <td><span class="badge bg-info text-dark">#{{ r.CustomerID }}</span></td>
+                                <td>{{ r.Recency }}d</td>
+                                <td>{{ r.Frequency }}</td>
+                                <td class="text-success fw-bold">${{ r.Monetary | round(2) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
